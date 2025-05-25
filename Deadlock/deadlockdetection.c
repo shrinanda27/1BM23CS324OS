@@ -66,11 +66,20 @@ int main() {
             break;
         }
     }
+    
 
     if (deadlock)
         printf("System is in a deadlock state.\n");
     else
         printf("System is not in a deadlock state.\n");
+    if (deadlock) {
+    printf("Deadlocked processes: ");
+    for (i = 0; i < n; i++) {
+        if (!finish[i])
+            printf("P%d ", i);
+    }
+    printf("\n");
+}
 
     return 0;
 }
