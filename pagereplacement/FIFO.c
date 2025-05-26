@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main() {
-	int frames, pages, pageFaults = 0, current = 0;
+	int frames, pages, pageFaults = 0,hit=0, current = 0;
 	int referenceString[100], frame[100]; // Max size to prevent runtime issues
 
 	printf("Enter number of frames: "); 
@@ -22,6 +22,7 @@ int main() {
 		int found = 0;
 		for (int j = 0; j < frames; j++) {
 			if (frame[j] == referenceString[i]) {
+				hit++;
 				found = 1;
 				break;
 			}
@@ -32,12 +33,13 @@ int main() {
 			pageFaults++;
 		}
 		printf("%d: ", referenceString[i]); 
-        for (int k = 0; k < frames; k++) { 
-        printf("%d ", frame[k]); 
-        } 
-        printf("\n");
+        	for (int k = 0; k < frames; k++) { 
+        		printf("%d ", frame[k]); 
+        	} 
+        	printf("\n");
 	}
 
 	printf("Total Page Faults: %d\n", pageFaults);
+	printf("Total Page hits: %d\n", hit);
 	return 0;
 }
