@@ -1,19 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_TASKS 10
+int gcd(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+int lcm(int a, int b) {
+    return (a * b) / gcd(a, b);
+}
 
 typedef struct {
     int id;
-    int CT;             // Computation Time
+    int CT;             // Computation Time (Burst time)
     int RT;             // Remaining Time
     int period;         // Period (release interval)
     int next_release;   // Next release time
     int deadline;       // Relative deadline
-    int abs_deadline;   // Absolute deadline (calculated)
+    int abs_deadline;   // Absolute deadline
 } Task;
 
-// Sort tasks by earliest absolute deadline
+// Sort tasks by earliest absolute deadline (and ID as tie breaker)
 void sort_by_deadline(Task tasks[], int n) {
     for (int i = 1; i < n; i++) {
         for (int j = 0; j < n - i; j++) {
@@ -68,17 +79,41 @@ void EDF(Task tasks[], int n, int totaltime) {
 }
 
 int main() {
-    // Define periodic tasks: {id, CT, RT, period, next_release, deadline, abs_deadline}
-    Task tasks[MAX_TASKS] = {
-        {1, 2, 0, 5, 0, 5, 0},  // Task 1: CT=2, Period=5, Deadline=5
-        {2, 1, 0, 3, 0, 3, 0},  // Task 2: CT=1, Period=3, Deadline=3
-        {3, 1, 0, 7, 0, 7, 0}   // Task 3: CT=1, Period=7, Deadline=7
-    };
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
 
-    int numTasks = 3;
-    int totalTime = 20;
+    Task tasks[n];
 
-    EDF(tasks, numTasks, totalTime);
+    printf("Enter the CPU burst times:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &tasks[i].CT);
+        tasks[i].id = i + 1;
+        tasks[i].RT = 0;               // initially no remaining work
+        tasks[i].next_release = 0;     // first release at time 0
+        tasks[i].abs_deadline = 0;     // will be set on first release
+    }
+
+    printf("Enter the deadlines:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &tasks[i].deadline);
+    }
+
+    printf("Enter the time periods:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &tasks[i].period);
+    }
+
+    // Compute hyperperiod (LCM of all periods)
+    int hyperperiod = tasks[0].period;
+    for (int i = 1; i < n; i++) {
+        hyperperiod = lcm(hyperperiod, tasks[i].period);
+    }
+
+    printf("\nSystem will execute for hyperperiod (LCM of periods): %d ms\n", hyperperiod);
+    printf("Starting Earliest Deadline First (EDF) Scheduling...\n\n");
+
+    EDF(tasks, n, hyperperiod);
 
     return 0;
 }
